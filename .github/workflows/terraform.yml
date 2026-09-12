@@ -1,0 +1,47 @@
+name: "Terraform CI/CD"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    name: "Terraform Run"
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the repository code to the runner
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Install the HashiCorp Terraform CLI on the runner
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.0" # You can change this to your preferred version
+
+      # 3. Check that all Terraform configuration files adhere to a canonical format
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      # 4. Initialize the working directory containing Terraform configuration files
+      - name: Terraform Init
+        run: terraform init
+
+      # 5. Generates an execution plan showing what actions Terraform will take
+      - name: Terraform Plan
+        run: terraform plan -input=false
+
+      # 6. Apply the changes (Only runs on pushes to the main branch)
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
+
+      # 7. Optional: Verify the file was created in the GitHub runner workspace
+      - name: Verify Created File
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: cat sample.txt
