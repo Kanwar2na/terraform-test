@@ -12,8 +12,6 @@ terraform {
 provider "azurerm" {
   features {}
 
-  # The CI identity cannot register every Azure provider at subscription scope.
-  # Register required providers separately, or grant it provider-registration rights.
   resource_provider_registrations = "none"
 }
 
