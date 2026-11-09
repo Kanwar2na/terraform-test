@@ -1,15 +1,25 @@
 terraform {
   required_version = ">= 1.0.0"
+
   required_providers {
-    local = {
-      source  = "hashicorp/local"
-      version = "~> 2.0"
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
     }
   }
 }
 
-# Creates the sample.txt file with the specified content
-resource "local_file" "sample" {
-  filename = "${path.module}/sample.txt"
-  content  = "Learning terraform"
+provider "azurerm" {
+  features {}
+}
+
+variable "location" {
+  description = "Azure region for the resource group."
+  type        = string
+  default     = "East US"
+}
+
+resource "azurerm_resource_group" "main" {
+  name     = "rsg-from-terrraform"
+  location = var.location
 }
